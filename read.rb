@@ -15,7 +15,7 @@ def main
     phones = Array[]
     phones2 = Array[]
 
-   csv_text = File.read('all_all_data.csv')
+   csv_text = File.read('data/all_all_data.csv')
     csv = CSV.parse(csv_text, :headers => true)
     csv.each do |row|
       #puts (row[0])[49,(row[0]).length-49]
