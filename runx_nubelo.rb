@@ -7,18 +7,25 @@ require 'csv'
 
 def main 
     titles = Array[]
-    citys = Array[]
-    datas = Array[]
-    emails = Array[]
-    sites = Array[]
-    address = Array[]
-    phones = Array[]
-    phones2 = Array[]
+    links = Array[]
+    publications = Array[]
+    times = Array[]
+    works = Array[]
+	ubications = Array[]
+    budgets = Array[]
+	experiences = Array[]
+    countries = Array[]
+    clients = Array[]
+    messages = Array[]
+    contents = Array[]
+
+
+
 
     begin
 
         puts "Begining the scraping" 
-        (1..3).each do |number|
+        (1..55).each do |number|
             
             puts number
 
@@ -31,48 +38,99 @@ def main
             puts "--------------------------------------------------------"
 
             title.each do |element|
-				puts (element.text)[41..-1]
-            	puts element.html('[href="dcell dcell-xl dcell-project-title t-fix-width-search"]')
-                #titles.push(element.css('[class="ttl_colapsable"]').text)
-                #citys.push(element.css('[class="sttl_colapsable"]')[0].text  )
-                #datas.push(element.css('[class="sttl_colapsable"]')[1].text  )
-			    #index_correo = element.css('[class="cntr_vermas_info01"]').text.index("Correo electrónico")
-                #if index_correo   
-                #    emails.push( element.css('[class="cntr_vermas_info01"]').text[index_correo+20, 50])
-                #else
-                #    emails.push("")
-                #end
-            
-                #if emails.last == ""
-                #    titles.pop
-                #    citys.pop
-                #    datas.pop
-                #    emails.pop
-                #    sites.pop
-                #    address.pop
-                #    phones.pop
-                #    phones2.pop
-                #end
+
+            	other_link = element.css('a').map { |link| link['href'] }
+				html2 = open(other_link[0])
+				#puts other_link[0]
+            	doc2 = Nokogiri::HTML(html2, nil, 'UTF-8')
+   	            details = doc2.css('[class="detailjob__list"]')
+
+   	            elementdetails1 = details[0]
+   	            elementdetails2 = details[1]
+
+   	            #puts elementdetails1.text.index("Publicación:")
+   	            index_publication = elementdetails1.text.index("Publicación")
+	            if index_publication   
+	                publications.push( elementdetails1.text[index_publication+20, 30])
+	            else
+	                publications.push("")
+	            end
+
+	            index_time = elementdetails1.text.index("Tiempo restante")
+	            if index_time   
+	                times.push( elementdetails1.text[index_time+17, 30])
+	            else
+	                times.push("")
+	            end
+
+	            index_work = elementdetails1.text.index("Tipo de trabajo")
+	            if index_work   
+	                works.push( elementdetails1.text[index_work+17, 30])
+	            else
+	                works.push("")
+	            end
+
+	            index_ubication = elementdetails1.text.index("Ubicación")
+	            if index_ubication   
+	                ubications.push( elementdetails1.text[index_ubication+11, 30])
+	            else
+	                ubications.push("")
+	            end
+
+	            index_budget = elementdetails2.text.index("Presupuesto")
+	            if index_budget   
+	                budgets.push( elementdetails2.text[index_budget+13, 30])
+	            else
+	                budgets.push("")
+	            end
+
+	            index_experience = elementdetails2.text.index("Experiencia requerida")
+	            if index_experience   
+	                experiences.push( elementdetails2.text[index_experience+23, 40])
+	            else
+	                experiences.push("")
+	            end
+
+				client = doc2.css('[class="client-profile-name"]')            
+   	            clients.push( client.text[1..-1] )
+
+   	            country = doc2.css('[class="client-profile-field client-profile-country"]')            
+   	            countries.push( country.text[14..-1] )
+   	            
+				content = doc2.css('[class="project-desc-content"]')            
+   	            contents.push( content.text )
+
+				message = doc2.css('[class="make-proposal--rclmn-paragraph first"]')            
+   	            messages.push( message.text )
+
+           		titles.push(  (element.text)[41..-1]  )
+            	links.push(  other_link[0]  )
 
             end
         end
         
 
-            CSV.open("file_name2.csv", "w") do |csv|
+            CSV.open("nubelo_works.csv", "w") do |csv|
                     csv << [
-                        "Empresa", "Ciudad","Informacion", "Email",
-                        "Sitio", "Direccion", "Telefono", "Telefono2"
+                        "Titulo", "Link","Publicación", "Tiempo Restante",
+                        "Tipo de trabajo", "Ubicación", "Presupuesto", "Experiencia Requerida",
+                        "Cliente","Pais","Contenido", "Mensaje"
                     ]
                     titles.each_with_index do |course, indexx|
                         csv << [
                             titles[indexx],
-                            citys[indexx],
-                            datas[indexx],
-                            emails[indexx],
-                            sites[indexx],
-                            address[indexx],
-                            phones[indexx],
-                            phones2[indexx]
+                            links[indexx],
+							publications[indexx],
+							times[indexx],
+							works[indexx],
+							ubications[indexx],
+							budgets[indexx],
+							experiences[indexx],
+							clients[indexx],
+							countries[indexx],
+							contents[indexx],
+							messages[indexx]
+
                         ]
                     end
                 end
@@ -83,3 +141,4 @@ def main
 end
 
 main    
+#http://compra.avianca.com/NBAmadeus/InicioAmadeus.aspx?cco=CLO&ccd=BAQ&fi=06AUG&fr=06AUG&na=1&nn=0&ni=0&lan=ES&tt=4&Pais=CO&ccorp=0&hvi=0&hvr=0&tarifa=0&VInt=no&SistemaOrigen=AH&Cabina=0&FFl=true&FriendlyID=&FriendlyIDNegoF=&tv=false&MPD=8621&IvaMPD=1379&WS=null
